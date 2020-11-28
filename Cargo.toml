@@ -1,0 +1,12 @@
+[lib]
+crate-type =["cdylib"]
+
+[package]
+name = "ureq_c"
+version = "0.1.0"
+authors = ["Eduardo Tongson <propolice@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+ureq = { version = "*", default-features = false, features = ["tls"] }
+serde_cbor = "0.11.1"
