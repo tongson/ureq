@@ -8,15 +8,16 @@ use std::collections::BTreeMap;
 use serde_cbor::{from_slice};
 
 #[no_mangle]
-pub extern "C" fn get(c: *const c_char) -> *const c_char {
+pub extern "C" fn qget(c: *const c_char) -> *const c_char {
   let b = unsafe { CStr::from_ptr(c).to_bytes() };
   let v: BTreeMap<String, String> = from_slice(b).unwrap();
-  let resp = ureq::get(&v["url"]).call();
-
+  let resp = ureq::get(&v["url"])
+    .set("User-Agent", "ureq.qget")
+    .call();
   let mut bytes = vec![];
   if resp.status().to_string() == "200" {
     let mut reader = resp.into_reader();
-    reader.read_to_end(&mut bytes);
+    let _ = reader.read_to_end(&mut bytes);
   } else {
     bytes = resp.status().to_string().as_bytes().to_vec();
   }
