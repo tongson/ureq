@@ -4,14 +4,14 @@ use std::io::Read;
 
 extern crate ureq;
 extern crate serde_cbor;
-use std::collections::BTreeMap;
+use std::collections::HashMap;
 use serde_cbor::{from_slice};
 
 #[no_mangle]
 pub extern "C" fn qget(c: *const c_char) -> *const c_char {
   // Build request from CBOR
   let b = unsafe { CStr::from_ptr(c).to_bytes() };
-  let v: BTreeMap<String, String> = from_slice(b).unwrap();
+  let v: HashMap<String, String> = from_slice(b).unwrap();
   let mut url = ureq::get(&v["url"]).build();
   let mut agent: ureq::Request;
   if v.contains_key("user-agent") {
@@ -39,7 +39,7 @@ pub extern "C" fn qget(c: *const c_char) -> *const c_char {
 #[no_mangle]
 pub extern "C" fn qpost(c: *const c_char) -> *const c_char {
   let b = unsafe { CStr::from_ptr(c).to_bytes() };
-  let v: BTreeMap<String, String> = from_slice(b).unwrap();
+  let v: HashMap<String, String> = from_slice(b).unwrap();
   let resp = ureq::post(&v["url"])
     .set("User-Agent", "ureq.qpost")
     .send_string(&v["payload"]);
