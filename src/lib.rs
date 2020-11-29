@@ -8,16 +8,16 @@ use std::collections::HashMap;
 use serde_cbor::{from_slice};
 
 #[no_mangle]
-pub extern "C" fn qget(c: *const c_char) -> *const c_char {
+pub extern "C" fn qget(m: *const c_char, c: *const c_char) -> *const c_char {
   // Build request from CBOR
-  let b = unsafe { CStr::from_ptr(c).to_bytes() };
-  let v: HashMap<String, String> = from_slice(b).unwrap();
-  let mut get = ureq::get(&v["__URL"]).build();
+  let mb = unsafe { CStr::from_ptr(m).to_bytes() };
+  let cb = unsafe { CStr::from_ptr(c).to_bytes() };
+  let mv: HashMap<String, String> = from_slice(mb).unwrap();
+  let cv: HashMap<String, String> = from_slice(cb).unwrap();
+  let mut get = ureq::get(&mv["url"]).build();
   let mut req: ureq::Request = get.set("User-Agent", "ureq.qget").build();
-  for (k, v) in &v {
-    if k != "__URL" {
-      req = get.set(k, v).build();
-    }
+  for (k, v) in &cv {
+    req = get.set(k, v).build();
   }
   // Block!
   let resp = req.call();
@@ -37,19 +37,19 @@ pub extern "C" fn qget(c: *const c_char) -> *const c_char {
 }
 
 #[no_mangle]
-pub extern "C" fn qpost(c: *const c_char) -> *const c_char {
+pub extern "C" fn qpost(m: *const c_char, c: *const c_char) -> *const c_char {
   // Build request from CBOR
-  let b = unsafe { CStr::from_ptr(c).to_bytes() };
-  let v: HashMap<String, String> = from_slice(b).unwrap();
-  let mut get = ureq::post(&v["__URL"]).build();
+  let mb = unsafe { CStr::from_ptr(m).to_bytes() };
+  let cb = unsafe { CStr::from_ptr(c).to_bytes() };
+  let mv: HashMap<String, String> = from_slice(mb).unwrap();
+  let cv: HashMap<String, String> = from_slice(cb).unwrap();
+  let mut get = ureq::post(&mv["url"]).build();
   let mut req: ureq::Request = get.set("User-Agent", "ureq.qpost").build();
-  for (k, v) in &v {
-    if k != "__URL" || k != "__SEND" {
-      req = get.set(k, v).build();
-    }
+  for (k, v) in &cv {
+    req = get.set(k, v).build();
   }
   // Block!
-  let resp = req.send_string(&v["__SEND"]);
+  let resp = req.send_string(&mv["data"]);
   // Process response
   let mut bytes = vec![];
   if resp.status().to_string() == "200" {
