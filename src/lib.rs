@@ -15,7 +15,7 @@ pub extern "C" fn qget(c: *const c_char) -> *const c_char {
   let mut get = ureq::get(&v["__URL"]).build();
   let mut req: ureq::Request = get.set("User-Agent", "ureq.qget").build();
   for (k, v) in &v {
-    if k != "__URL" || k != "__SEND" {
+    if k != "__URL" {
       req = get.set(k, v).build();
     }
   }
