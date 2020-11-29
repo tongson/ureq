@@ -9,7 +9,7 @@ use serde_cbor::{from_slice};
 
 #[no_mangle]
 pub extern "C" fn qget(c: *const c_char) -> *const c_char {
-  // Process CBOR
+  // Build request from CBOR
   let b = unsafe { CStr::from_ptr(c).to_bytes() };
   let v: BTreeMap<String, String> = from_slice(b).unwrap();
   let mut url = ureq::get(&v["url"]).build();
