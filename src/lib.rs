@@ -13,14 +13,14 @@ pub extern "C" fn qget(c: *const c_char) -> *const c_char {
   let b = unsafe { CStr::from_ptr(c).to_bytes() };
   let v: HashMap<String, String> = from_slice(b).unwrap();
   let mut url = ureq::get(&v["url"]).build();
-  let mut agent: ureq::Request;
+  let mut req: ureq::Request;
   if v.contains_key("user-agent") {
-    agent = url.set("User-Agent", &v["user-agent"]).build();
+    req = url.set("User-Agent", &v["user-agent"]).build();
   } else {
-    agent = url.set("User-Agent", "ureq.qget").build();
+    req = url.set("User-Agent", "ureq.qget").build();
   }
   // Block!
-  let resp = agent.call();
+  let resp = req.call();
   // Process response
   let mut bytes = vec![];
   if resp.status().to_string() == "200" {
