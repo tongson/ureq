@@ -9,6 +9,7 @@ use serde_cbor::{from_slice};
 
 #[no_mangle]
 pub extern "C" fn qget(c: *const c_char) -> *const c_char {
+  // Process CBOR
   let b = unsafe { CStr::from_ptr(c).to_bytes() };
   let v: BTreeMap<String, String> = from_slice(b).unwrap();
   let mut url = ureq::get(&v["url"]).build();
@@ -18,7 +19,9 @@ pub extern "C" fn qget(c: *const c_char) -> *const c_char {
   } else {
     agent = url.set("User-Agent", "ureq.qget").build();
   }
+  // Block!
   let resp = agent.call();
+  // Process response
   let mut bytes = vec![];
   if resp.status().to_string() == "200" {
     let mut reader = resp.into_reader();
@@ -26,7 +29,7 @@ pub extern "C" fn qget(c: *const c_char) -> *const c_char {
   } else {
     bytes = resp.status().to_string().as_bytes().to_vec();
   }
-
+  // Return response
   let c_str = CString::new(bytes).unwrap();
   let ptr = c_str.as_ptr();
   std::mem::forget(c_str);
