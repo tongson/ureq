@@ -1,6 +1,7 @@
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
 use std::io::Read;
+use std::panic;
 
 extern crate ureq;
 extern crate serde_json;
@@ -10,6 +11,7 @@ use serde_json::from_slice;
 
 #[no_mangle]
 pub extern "C" fn qget(c: *const c_char) -> *const c_char {
+  panic::set_hook(Box::new(move |_| eprintln!("panic: ureq.qget()")));
   #[derive(Deserialize)]
   struct Args {
     url: String,
@@ -43,6 +45,7 @@ pub extern "C" fn qget(c: *const c_char) -> *const c_char {
 
 #[no_mangle]
 pub extern "C" fn qpost(c: *const c_char) -> *const c_char {
+  panic::set_hook(Box::new(move |_| eprintln!("panic: ureq.qpost()")));
   #[derive(Deserialize)]
   struct Args {
     url: String,
