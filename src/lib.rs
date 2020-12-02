@@ -8,8 +8,6 @@ use std::collections::HashMap;
 use serde::{Deserialize};
 use serde_json::from_slice;
 
-
-
 #[no_mangle]
 pub extern "C" fn qget(c: *const c_char) -> *const c_char {
   #[derive(Deserialize)]
@@ -51,7 +49,6 @@ pub extern "C" fn qpost(c: *const c_char) -> *const c_char {
     data: String,
     headers: HashMap<String, String>,
   }
-
   // Build request from JSON
   let cb = unsafe { CStr::from_ptr(c).to_bytes() };
   let v: Args = from_slice(cb).unwrap();
