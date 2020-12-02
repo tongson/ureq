@@ -3,20 +3,27 @@ use std::os::raw::c_char;
 use std::io::Read;
 
 extern crate ureq;
-extern crate serde_cbor;
+extern crate serde_json;
 use std::collections::HashMap;
-use serde_cbor::{from_slice};
+use serde::{Deserialize};
+use serde_json::from_slice;
+
+
 
 #[no_mangle]
-pub extern "C" fn qget(m: *const c_char, c: *const c_char) -> *const c_char {
-  // Build request from CBOR
-  let mb = unsafe { CStr::from_ptr(m).to_bytes() };
+pub extern "C" fn qget(c: *const c_char) -> *const c_char {
+  #[derive(Deserialize)]
+  struct Args {
+    url: String,
+    headers: HashMap<String, String>,
+  }
+  // Build request from JSON
   let cb = unsafe { CStr::from_ptr(c).to_bytes() };
-  let mv: HashMap<String, String> = from_slice(mb).unwrap();
-  let cv: HashMap<String, String> = from_slice(cb).unwrap();
-  let mut get = ureq::get(&mv["url"]).build();
+  let v: Args = from_slice(cb).unwrap();
+  let h: HashMap<String, String> = v.headers;
+  let mut get = ureq::get(&v.url).build();
   let mut req: ureq::Request = get.set("User-Agent", "ureq.qget").build();
-  for (k, v) in &cv {
+  for (k, v) in &h {
     req = get.set(k, v).build();
   }
   // Block!
@@ -37,19 +44,25 @@ pub extern "C" fn qget(m: *const c_char, c: *const c_char) -> *const c_char {
 }
 
 #[no_mangle]
-pub extern "C" fn qpost(m: *const c_char, c: *const c_char) -> *const c_char {
-  // Build request from CBOR
-  let mb = unsafe { CStr::from_ptr(m).to_bytes() };
+pub extern "C" fn qpost(c: *const c_char) -> *const c_char {
+  #[derive(Deserialize)]
+  struct Args {
+    url: String,
+    data: String,
+    headers: HashMap<String, String>,
+  }
+
+  // Build request from JSON
   let cb = unsafe { CStr::from_ptr(c).to_bytes() };
-  let mv: HashMap<String, String> = from_slice(mb).unwrap();
-  let cv: HashMap<String, String> = from_slice(cb).unwrap();
-  let mut get = ureq::post(&mv["url"]).build();
+  let v: Args = from_slice(cb).unwrap();
+  let h: HashMap<String, String> = v.headers;
+  let mut get = ureq::post(&v.url).build();
   let mut req: ureq::Request = get.set("User-Agent", "ureq.qpost").build();
-  for (k, v) in &cv {
+  for (k, v) in &h {
     req = get.set(k, v).build();
   }
   // Block!
-  let resp = req.send_string(&mv["data"]);
+  let resp = req.send_string(&v.data);
   // Process response
   let mut bytes = vec![];
   if resp.status().to_string() == "200" {
