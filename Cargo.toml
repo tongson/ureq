@@ -2,7 +2,7 @@
 crate-type =["cdylib"]
 
 [package]
-name = "ureq_c"
+name = "http"
 version = "0.1.0"
 authors = ["Eduardo Tongson <propolice@gmail.com>"]
 edition = "2018"
