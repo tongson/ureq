@@ -1,13 +1,13 @@
 use std::ffi::{CStr, CString};
-use std::os::raw::c_char;
 use std::io::Read;
+use std::os::raw::c_char;
 use std::panic;
 
-extern crate ureq;
 extern crate serde_json;
-use std::collections::HashMap;
-use serde::{Deserialize};
+extern crate ureq;
+use serde::Deserialize;
 use serde_json::from_slice;
+use std::collections::HashMap;
 
 #[no_mangle]
 pub extern "C" fn qget(c: *const c_char) -> *const c_char {
@@ -40,7 +40,7 @@ pub extern "C" fn qget(c: *const c_char) -> *const c_char {
   let c_str = CString::new(bytes).unwrap();
   let ptr = c_str.as_ptr();
   std::mem::forget(c_str);
-  return ptr
+  return ptr;
 }
 
 #[no_mangle]
@@ -75,5 +75,5 @@ pub extern "C" fn qpost(c: *const c_char) -> *const c_char {
   let c_str = CString::new(bytes).unwrap();
   let ptr = c_str.as_ptr();
   std::mem::forget(c_str);
-  return ptr
+  return ptr;
 }
