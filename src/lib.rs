@@ -30,7 +30,7 @@ pub extern "C" fn qget(c: *const c_char) -> *const c_char {
   let resp = req.call();
   // Process response
   let mut bytes = vec![];
-  if resp.status().to_string() == "200" {
+  if resp.ok() {
     let mut reader = resp.into_reader();
     let _ = reader.read_to_end(&mut bytes);
   } else {
@@ -65,7 +65,7 @@ pub extern "C" fn qpost(c: *const c_char) -> *const c_char {
   let resp = req.send_string(&v.data);
   // Process response
   let mut bytes = vec![];
-  if resp.status().to_string() == "200" {
+  if resp.ok() {
     let mut reader = resp.into_reader();
     let _ = reader.read_to_end(&mut bytes);
   } else {
